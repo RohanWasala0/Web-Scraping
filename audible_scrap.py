@@ -1,5 +1,5 @@
 import cutie
-import pandas
+import pandas as pd
 
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
@@ -41,11 +41,16 @@ _title, _author, _narrator, _duration, _released_data, _language, _rating = [], 
 while current_page_index <= _last_page_index:
     container = WebDriverWait(driver, 2).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, 'adbl-impression-container ')))
     books = WebDriverWait(container, 2).until(expected_conditions.presence_of_all_elements_located((By.XPATH, "./div/span/ul/li")))
-
+    
     for book in books:
-        #_title.append(book.find_element(By.XPATH, "//li[@class = 'bc-list-item']").text)
-        title = book.find_element(By.XPATH, "//h3[contains(@class, 'bc-list-item'])").text
-        print(title)
+        _title.append(book.find_element(By.XPATH, ".//h3[contains(@class, 'bc-heading')]/a").text)
+        _author.append(book.find_element(By.XPATH, ".//li[contains(@class, 'authorLabel')]/span/a").text)
+        _narrator.append(book.find_element(By.XPATH, ".//li[contains(@class, 'narratorLabel')]/span/a").text)
+        _duration.append(book.find_element(By.XPATH, ".//li[contains(@class, 'runtimeLabel')]").text)
+        _released_data.append(book.find_element(By.XPATH, ".//li[contains(@class, 'releaseDateLabel')]").text)
+        _language.append(book.find_element(By.XPATH, ".//li[contains(@class, 'languageLabel')]").text)
+#        _rating.append(book.find_element(By.XPATH, ".//li/span[@class='bc-text bc-pub-offscreen']").text)
+
     current_page_index += 1
 
     try:
@@ -53,6 +58,14 @@ while current_page_index <= _last_page_index:
     except Exception:
         break
 
-#print(_title[1])
+df = pd.DataFrame({
+    'title': _title,
+    'author': _author,
+    'narrator': _narrator,
+    'duration': _duration,
+    'released data': _released_data,
+    "language": _language, 
+})
+df.to_csv("audible_by_categories.csv", index=False)
 driver.quit()
 
