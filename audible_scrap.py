@@ -19,6 +19,14 @@ def select_categories(categories_list):
     print(f"Selected Category: {link_text}")
     categories_list[selected_categories_index].click()
 
+def caculating_rating(list_element):
+    full_star = list_element.find_elements(By.XPATH, './/span[@class="full-review-star"]')
+    half_star = list_element.find_elements(By.XPATH, './/span[@class="half-review-star"]')
+
+    rating = (1 * len(full_star)) + (0.5 * len(half_star))
+    return rating
+
+
 options = Options()
 options.add_argument('-headless')
 
@@ -49,7 +57,8 @@ while current_page_index <= _last_page_index:
         _duration.append(book.find_element(By.XPATH, ".//li[contains(@class, 'runtimeLabel')]").text)
         _released_data.append(book.find_element(By.XPATH, ".//li[contains(@class, 'releaseDateLabel')]").text)
         _language.append(book.find_element(By.XPATH, ".//li[contains(@class, 'languageLabel')]").text)
-#        _rating.append(book.find_element(By.XPATH, ".//li/span[@class='bc-text bc-pub-offscreen']").text)
+        list_element = book.find_element(By.XPATH, ".//li[contains(@class, 'ratingsLabel')]")
+        _rating.append(caculating_rating(list_element))
 
     current_page_index += 1
 
@@ -64,8 +73,8 @@ df = pd.DataFrame({
     'narrator': _narrator,
     'duration': _duration,
     'released data': _released_data,
-    "language": _language, 
+    'language': _language,
+    'rating': _rating,
 })
 df.to_csv("audible_by_categories.csv", index=False)
 driver.quit()
-
