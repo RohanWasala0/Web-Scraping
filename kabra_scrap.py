@@ -1,3 +1,5 @@
+import pandas as pd
+
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
@@ -32,12 +34,34 @@ if input_pair_number in temp:
     table_head = table_element.find_element(By.TAG_NAME, 'thead')
     table_body = table_element.find_element(By.TAG_NAME, 'tbody')
 
-    table_head_elements = table_head.find_elements(By.XPATH, './td[contains(@scope, "col")]')
-    table_body_elements = table_body.find_elements(By.TAG_NAME, 'tr')
+    fTable_head = []
+    table_head_elements = table_head.find_elements(By.TAG_NAME, 'tr')
     for m in table_head_elements:
-        print(m.text)
-    print(len(table_body_elements))
+        table_head_data = m.find_elements(By.TAG_NAME, 'th')
+        for x in table_head_data:
+            _ = x.text
+            if _ != '':
+                fTable_head.append(_)
+    
+    fTable_head = fTable_head[:fTable_head.index('Score')] + ['', 'Score_NS', 'Score_WE'] + fTable_head[fTable_head.index('Score')+1:-2]
+    table_body_elements = table_body.find_elements(By.TAG_NAME, 'tr')
+    Round, Opponent = '', ''
+    fTable_body = []
+    for n in table_body_elements:
+        table_body_data = n.find_elements(By.TAG_NAME, 'td')
+        _temp = list(h.text for h in table_body_data)
+        no=0
+        if len(_temp) == 13:
+            Round = _temp[0]
+            Opponent = _temp[1]
+            no= 2
+        _temp = [Round, Opponent] + _temp[no:]
+        fTable_body.append(_temp)
 else:
     print("player pair is not in the player pair list")
-
+fTable_body.pop(0)
+fTable_body.pop(-1)
+print(fTable_head, fTable_body)
+df = pd.DataFrame(fTable_body, columns=fTable_head)
+df.to_csv("kabra.csv", index=False)
 driver.quit()
