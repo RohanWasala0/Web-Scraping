@@ -44,7 +44,7 @@ if input_pair_number in temp:
     table_body_elements = table_body.find_elements(By.TAG_NAME, 'tr')
     Round, Opponent = '', ''
     fTable_body = []
-    for n in table_body_elements:
+    for n in table_body_elements:  
         table_body_data = n.find_elements(By.TAG_NAME, 'td')
         _temp = list(h.text for h in table_body_data)
         no = 0
