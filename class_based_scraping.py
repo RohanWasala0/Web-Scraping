@@ -22,7 +22,10 @@ class Scrape():
             )
         )
         pass
-    
+    """
+    return 
+        - list of player pairs for the user to select
+    """
     def make_pairs_list(self):
         self.wait_to_load("//tbody[@id='rBody']/tr")
         self.pair_numbers = self.driver.find_elements(By.XPATH, "//a[contains(@class, 'pairNumberLink')]")
@@ -30,7 +33,10 @@ class Scrape():
         return self.display_pair_numbers
     """
     IP_pair_number: int
-        - 
+        - player pair input by user
+    clicks the player pair link element respective to user input
+    return 
+        - boolean check for correct input
     """
     def click_pair_number(self, IP_pair_number: int):
         try:
@@ -39,7 +45,12 @@ class Scrape():
         except Exception:
             print(f"The player pair {IP_pair_number} is not in the player pair table")
             return False
-
+    """
+    return 
+        - head_elements_data: list(str)
+        - body_elements_data: list(str)
+    logic to scrap data
+    """
     def extract_table(self):
         table_ = self.driver.find_element(By.XPATH, "//div[@id='contentH']/table[@id='tableH']")
         self.wait_to_load("//tbody[@id='hBody']/tr")
