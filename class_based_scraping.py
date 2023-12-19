@@ -90,7 +90,7 @@ class Scrape():
             if len(temp) == 13:
                 Round, Opponent, no = temp[0].text, temp[1].text, 2 
             list_to_append = list([Round, Opponent] + list(y.text for y in temp[no:]))
-            print(len(list_to_append), len(head_elements_data))
+            # print(len(list_to_append), len(head_elements_data))
             if len(list_to_append) == len(head_elements_data):
                 body_elements_data.append(list_to_append)
         
@@ -116,12 +116,12 @@ obj.click_group(ondex)
 pair_list = obj.make_pairs_list()
 print(pair_list)
 
-# input_pair = int(input("Enter the players pair number from the above list \n"))
-# exception_bool = obj.click_pair_number(input_pair)
-# if exception_bool:
-#     o1, o2 = obj.extract_table()
-#     print(o2[:7])
-#     df = pd.DataFrame(o2, columns=o1)
-#     df.to_csv(f"{input_pair}_kabra.csv", index=False)
+input_pair = int(input("Enter the players pair number from the above list \n"))
+exception_bool = obj.click_pair_number(input_pair)
+if exception_bool:
+    o1, o2 = obj.extract_table()
+    # print(o2[:7])
+    df = pd.DataFrame(o2, columns=o1)
+    df.to_csv(f"{input_pair}_kabra.csv", index=False)
 
 obj.quit_driver()
