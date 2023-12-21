@@ -24,46 +24,39 @@ class Scrape():
         )
         pass
     """
+    IP_list_link: list(Webelement)
+        - list of web elements
+    IP_: int
+        - at which index in the list IP_list_link to be clicked 
+    return 
+        - boolean check for correct input
+    """
+    def click_link(self, IP_list_link: [list], IP_: int):
+        try:
+            IP_list_link[IP_].click()
+            return True
+        except Exception:
+            print(f"the Input {IP_} is invalid")
+            return False
+    """
     return
         - list of groups for the user to select
     """
     def category_display(self):
         self.wait_to_load("//ul[contains(@class, 'navbar-nav')]")
         div = self.driver.find_element(By.XPATH, "//div[@id='stagesNavbar']")
-        self.group_list = div.find_elements(By.XPATH, ".//li[@class='nav-item']")
-        self.display_group_list = list(y.text for y in self.group_list if y.text != '')
-        return self.display_group_list
+        group_list = div.find_elements(By.XPATH, ".//li[@class='nav-item']")
+        display_group_list = list(y.text for y in group_list if y.text != '')
+        return display_group_list, group_list 
     """
     return 
         - list of player pairs for the user to select
     """
     def make_pairs_list(self):
         self.wait_to_load("//tbody[@id='rBody']/tr")
-        self.pair_numbers = self.driver.find_elements(By.XPATH, "//a[contains(@class, 'pairNumberLink')]")
-        self.display_pair_numbers = list(int(x.text) for x in self.pair_numbers if x.text != '')
-        return self.display_pair_numbers
-    """
-    """
-    def click_group(self, IP_group_number: int):
-        try:
-            self.group_list[IP_group_number].click()
-        except Exception:
-            print(f"The catagory number {IP_group_number} is not in the player pair table")
-    """
-    IP_pair_number: int
-        - player pair input by user
-    clicks the player pair link element respective to user input
-    return 
-        - boolean check for correct input
-    """
-    def click_pair_number(self, IP_pair_number: int):
-        try:
-            self.pair_numbers[self.display_pair_numbers.index(IP_pair_number)].click()
-            return True
-        except Exception:
-            print(f"The player pair {IP_pair_number} is not in the player pair table")
-            return False
-    
+        pair_numbers = self.driver.find_elements(By.XPATH, "//a[contains(@class, 'pairNumberLink')]")
+        display_pair_numbers = list(int(x.text) for x in pair_numbers if x.text != '')
+        return display_pair_numbers, pair_numbers 
     """
     return 
         - head_elements_data: list(str)
@@ -96,7 +89,7 @@ class Scrape():
         
         
         return head_elements_data, body_elements_data
-    
+    #closes the driver
     def quit_driver(self):
         self.driver.quit()
     
@@ -108,19 +101,18 @@ options.add_argument('-headless')
 website = "https://bfi.net.in/wp-content/uploads/2023/kabrapairs/"
 obj = Scrape(website, options)
 
-category_list = obj.category_display()
-ondex = cutie.select(category_list, caption_indices=[0], selected_index=1)
-print(category_list[ondex])
-obj.click_group(ondex)
+Cdisplay_list, C_list = obj.category_display()
+ondex = cutie.select(Cdisplay_list, caption_indices=[0], selected_index=1)
+print(Cdisplay_list[ondex])
+obj.click_link(C_list, ondex)
 
-pair_list = obj.make_pairs_list()
-print(pair_list)
-
+Pdisplay_list, P_list = obj.make_pairs_list()
+print(Pdisplay_list)
 input_pair = int(input("Enter the players pair number from the above list \n"))
-exception_bool = obj.click_pair_number(input_pair)
+exception_bool = obj.click_link(P_list, Pdisplay_list.index(input_pair))
+
 if exception_bool:
     o1, o2 = obj.extract_table()
-    # print(o2[:7])
     df = pd.DataFrame(o2, columns=o1)
     df.to_csv(f"{input_pair}_kabra.csv", index=False)
 
